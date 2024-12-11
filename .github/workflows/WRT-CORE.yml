@@ -102,7 +102,7 @@ jobs:
 
       - name: Initialization Values
         run: |
-          export WRT_DATE=$(TZ=UTC-8 date +"%y.%m.%d_%H.%M.%S")
+          export WRT_DATE=$(TZ=UTC-8 date +"%y%m%d")
           export WRT_CI=$(basename $GITHUB_WORKSPACE)
           export WRT_VER=$(echo $WRT_REPO | cut -d '/' -f 4)-$WRT_BRANCH
           export WRT_TYPE=$(sed -n "1{s/^#//;s/\r$//;p;q}" $GITHUB_WORKSPACE/Config/$WRT_TARGET.txt)
@@ -153,6 +153,8 @@ jobs:
       - name: Update Feeds
         run: |
           cd ./wrt/
+
+          $GITHUB_WORKSPACE/Scripts/ChangeSources.sh
 
           ./scripts/feeds update -a
           ./scripts/feeds install -a
@@ -224,16 +226,14 @@ jobs:
           fi
 
       - name: Release Firmware
-        uses: softprops/action-gh-release@master
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{env.WRT_TARGET}}_${{env.WRT_VER}}_${{env.WRT_DATE}}
           files: ./wrt/upload/*.*
           body: |
-            这是个平台固件包，内含多个设备！
-            请注意选择你需要的设备固件！
-            不要问，刷就完事了！
-
-            全系带闭源硬件加速，别问了！
+            基于H大和237仓库构建的MT7981设备固件，全系配备闭源驱动
+            修改了Luci源解决某些插件依赖问题
+            采用luci-theme-design主题，自定义少量插件
 
             WIFI名称：${{env.WRT_SSID}}
             WIFI密码：${{env.WRT_WORD}}
