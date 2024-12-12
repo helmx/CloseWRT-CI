@@ -218,11 +218,14 @@ jobs:
                 EXT=$(basename $FILE | cut -d '.' -f 2-)
                 NAME=$(basename $FILE | cut -d '.' -f 1 | grep -io "\($TYPE\).*")
                 NEW_FILE="$WRT_VER"_"$NAME"_"$WRT_DATE"."$EXT"
+                if [[ "$NEW_FILE" == *"kernel"* ]]; then
+                  echo "Skipping $NEW_FILE as it contains 'kernel'"
+                  continue
+                fi
                 mv -f $FILE ./upload/$NEW_FILE
               done
             done
 
-            find ./bin/targets/ -type f -exec mv -f {} ./upload/ \;
           fi
 
       - name: Release Firmware
